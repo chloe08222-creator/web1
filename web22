@@ -1,0 +1,127 @@
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+const questions = [
+  {
+    question: "연인이 하루종일 연락이 없을 때 나는?",
+    options: [
+      { text: "불안해서 먼저 연락한다", type: "A" },
+      { text: "이유가 있겠지 하고 기다린다", type: "B" },
+      { text: "나도 신경 안 쓴다", type: "C" },
+    ],
+  },
+  {
+    question: "데이트 스타일은?",
+    options: [
+      { text: "항상 함께 있고 싶다", type: "A" },
+      { text: "적당한 거리 유지", type: "B" },
+      { text: "각자 시간 중요", type: "C" },
+    ],
+  },
+  {
+    question: "싸움이 났을 때 나는?",
+    options: [
+      { text: "바로 풀고 싶다", type: "A" },
+      { text: "시간을 두고 이야기", type: "B" },
+      { text: "피하고 싶다", type: "C" },
+    ],
+  },
+  {
+    question: "연애에서 가장 중요한 것은?",
+    options: [
+      { text: "애정 표현", type: "A" },
+      { text: "신뢰", type: "B" },
+      { text: "자유", type: "C" },
+    ],
+  },
+  {
+    question: "기념일에 나는?",
+    options: [
+      { text: "꼭 챙긴다", type: "A" },
+      { text: "적당히 챙긴다", type: "B" },
+      { text: "별로 중요하지 않다", type: "C" },
+    ],
+  },
+];
+
+function getResult(answers) {
+  const count = { A: 0, B: 0, C: 0 };
+  answers.forEach((a) => count[a]++);
+
+  if (count.A >= 3)
+    return {
+      type: "애정집착형",
+      desc: "사랑을 많이 주고 많이 받고 싶은 스타일",
+      match: "독립적이면서도 따뜻한 사람",
+    };
+
+  if (count.B >= 3)
+    return {
+      type: "균형형",
+      desc: "안정적인 연애를 추구하는 스타일",
+      match: "비슷한 가치관을 가진 사람",
+    };
+
+  return {
+    type: "자유형",
+    desc: "자유롭고 쿨한 연애를 선호",
+    match: "간섭하지 않는 독립적인 사람",
+  };
+}
+
+export default function LoveStyleApp() {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [result, setResult] = useState(null);
+
+  const handleAnswer = (type) => {
+    const newAnswers = [...answers, type];
+    setAnswers(newAnswers);
+
+    if (step + 1 < questions.length) {
+      setStep(step + 1);
+    } else {
+      setResult(getResult(newAnswers));
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-pink-50">
+      <Card className="w-full max-w-md p-6 rounded-2xl shadow-xl">
+        <CardContent>
+          {!result ? (
+            <div>
+              <h2 className="text-xl font-bold mb-4">
+                Q{step + 1}. {questions[step].question}
+              </h2>
+              <div className="space-y-3">
+                {questions[step].options.map((opt, idx) => (
+                  <Button
+                    key={idx}
+                    className="w-full"
+                    onClick={() => handleAnswer(opt.type)}
+                  >
+                    {opt.text}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center space-y-4">
+              <h2 className="text-2xl font-bold">당신의 연애 스타일</h2>
+              <p className="text-lg">{result.type}</p>
+              <p>{result.desc}</p>
+              <hr />
+              <h3 className="text-xl font-semibold">잘 맞는 스타일</h3>
+              <p>{result.match}</p>
+              <Button onClick={() => window.location.reload()}>
+                다시하기
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
